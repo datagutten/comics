@@ -19,6 +19,9 @@ django_compressor >= 1.1, < 1.2
 cssmin >= 0.1, < 0.2
 jsmin >= 2.0, < 2.1
 
+# For fast template rendering
+Jinja2 >= 2.6, < 2.7
+
 # For user registration with email verification
 django-registration >= 0.8, < 0.9
 
