@@ -16,6 +16,25 @@ from django.views.generic import (
 from comics.core.models import Comic, Release
 
 
+import time
+import logging
+
+class Logger(object):
+    def __init__(self):
+        self.calls = []
+
+    def log(self, msg, *args):
+        self.calls.append((time.time(), msg, args))
+
+    def done(self):
+        total = self.calls[-1][0] - self.calls[0][0]
+        previous = self.calls[0][0]
+        for call in self.calls:
+            diff =  (call[0] - previous)
+            logging.info('%5.2fms %d%%: ' + call[1], diff*1000, diff/total*100, *call[2])
+            previous = call[0]
+
+
 class LoginRequiredMixin(object):
     """Things common for views requiring the user to be logged in"""
 
@@ -23,6 +42,8 @@ class LoginRequiredMixin(object):
     def dispatch(self, *args, **kwargs):
         # This overide is here so that the login_required decorator can be
         # applied to all the views subclassing this class.
+        self.logger = Logger()
+        self.logger.log('start')
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
 
     def get_user(self):
@@ -55,8 +76,15 @@ class ReleaseMixin(LoginRequiredMixin, ComicMixin):
         # We hook into render_to_response() instead of get_context_data()
         # because the date based views only populate the context with
         # date-related information right before render_to_response() is called.
+        self.logger.log('in render_to_response')
         context.update(self.get_release_context_data(context))
-        return super(ReleaseMixin, self).render_to_response(context, **kwargs)
+        self.logger.log('get_release_context_data()')
+        response = super(ReleaseMixin, self).render_to_response(context, **kwargs)
+        self.logger.log('ReleaseMixin.render_to_response()')
+        response.render()
+        self.logger.log('render()')
+        self.logger.done()
+        return response
 
     def get_release_context_data(self, context):
         # The methods called later in this method assumes that ``self.context``
