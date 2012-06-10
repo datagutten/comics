@@ -1,4 +1,4 @@
-{% load cache compress list_to_columns static %}
+{% load cache compress static %}
 {% load url from future %}
 <!DOCTYPE html>
 
@@ -24,14 +24,18 @@
         <div class="navbar navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
-              <a class="brand" href="{% url "home" %}">{{ site_title }}</a>
+              {% if user.is_authenticated %}
+                <a class="brand" href="{% url "mycomics_latest" %}">{{ site_title }}</a>
+              {% else %}
+                <a class="brand" href="{% url "home" %}">{{ site_title }}</a>
+              {% endif %}
               {% block site_menu %}
                 <ul class="nav">
                 {% if user.is_authenticated %}
-                  <li class="{{ active.home|yesno:"active," }}" >
-                    <a href="{% url "home" %}">
-                      <i class="icon-home"></i>
-                      Home</a>
+                  <li class="{{ active.comics|yesno:"active," }}" >
+                    <a href="{% url "mycomics_latest" %}">
+                      <i class="icon-th-large"></i>
+                      Comics</a>
                   </li>
                   <li class="{{ active.account|yesno:"active," }}" >
                     <a href="{% url "account" %}">
@@ -76,50 +80,21 @@
         </div>
 
         <div id="cloud">
-          {% block cloud %}
-            {% if user.is_authenticated %}
-              {% cache 500 'all_comics' %}
-                <div class="page-header">
-                  <h3>All comics</h3>
-                </div>
-                {% if all_comics %}
-                  {% list_to_columns all_comics as comic_columns 4 %}
-                  <div class="row">
-                    {% for comic_column in comic_columns %}
-                      <div class="span3">
-                        <ul>
-                          {% for comic in comic_column %}
-                            <li class="{% if comic.active %}active{% else %}inactive{% endif %}">
-                              {% if comic.is_new %}
-                                <span class="label label-info">New</span>&nbsp;
-                              {% endif %}
-                              <a href="{{ comic.get_absolute_url }}">{{ comic.name }}</a>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      </div>
-                    {% endfor %}
-                  {% else %}
-                    <div class="alert alert-info">
-                      <strong>No comics found in the database.</strong>
-                    </div>
-
-                    {% if user.is_superuser %}
-                      <div class="alert alert-error">
-                        <strong>To the site admin:</strong>
-                        You can add comics to the site by running:
-                        <code>python manage.py comics_addcomics -c ...</code>
-                      </div>
-                    {% endif %}
-                  {% endif %}
-                </div>
-              {% endcache %}
-            {% endif %}
-          {% endblock cloud %}
+          {% block cloud %}{% endblock %}
         </div>
 
       {% endblock body %}
 
+    </div>
+
+    <div class="keyboard-shortcuts modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h3>Keyboard shortcuts</h3>
+      </div>
+      <div class="modal-body">
+        {% include "help/keyboard_content.html" %}
+      </div>
     </div>
 
     {% block extra_footer %}

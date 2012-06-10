@@ -6,10 +6,11 @@ This change log is used to track all major changes to *comics* after the first
 versioned release.
 
 
-v2.0 (in development)
-=====================
+v2.0.0 (2012-06-11)
+===================
 
-Version 2.0 refreshes most parts of the *comics* web interface.
+Version 2 refreshes the entire *comics* web interface. The aggregation part
+of *comics* is mostly unchanged since v1.1.
 
 - Design: New design based on Twitter Bootstrap.
 
@@ -22,30 +23,52 @@ Version 2.0 refreshes most parts of the *comics* web interface.
 
   - Add user information to footer of emails sent from the feedback page.
 
-  - Require a user specific secret key to allow access to feeds.
+  - Require a user specific secret key to allow access to feeds. (Fixes:
+    :issue:`25`)
 
   - Add support for requiring an invitation to register as a new user. Set the
     setting ``INVITE_MODE`` to ``True`` to require invitation before
-    registration.
+    registration. (Fixes: :issue:`29`)
 
 - "My comics":
 
-  - Replace named comic sets with user associated comic selections, called "my
-    comics". An importer from old comics sets to "my comics" is included.
+  - Replace named comic sets with comic subscriptions associated with users,
+    called "my comics". An importer for converting old comics sets to "my
+    comics" is included. (Fixes: :issue:`26`, :issue:`27`)
 
   - Add buttons to all comic views for adding the comic to "my comics".
 
-  - Add buttons to "my comics" for removing the comic from "my comics".
+  - Extend comics list in the footer to include subscription management.
+    (Fixes: :issue:`28`, :issue:`49`)
 
 - Comics browsing:
 
   - Orders the "latest" view by fetched time instead of comic name. New content
-    is always at the top.
+    is always at the top. (Fixes: :issue:`13`)
 
-  - Removes browsing of weeks or N days.
+  - Removes browsing of weeks or N days, with the exception of +1 days, which
+    is kept as a "today" view.
 
   - Reimplemented lots of crusty old code using Django's class-based generic
     views.
+
+  - Reimplement feeds using regular feeds instead of Django's feed abstraction
+    to reduce the feed response time enough to not cause timeouts when using
+    e.g. Netvibes to subscribe to feeds. (Fixes: :issue:`5`)
+
+- Comics crawling:
+
+  - Try to verify that image files are valid by loading them with PIL before
+    saving them. (Fixes: :issue:`17`)
+
+  - Use PIL instead of server provided MIME types to identify the image type.
+
+  - Removed unused ``check_image_mime_type`` crawler setting.
+
+  - Whitelist GIF, JPEG, and PNG files. All other file types are rejected.
+    (Fixes: :issue:`16`)
+
+  - Blacklisted the GoComics placeholder image.
 
 - Development:
 
@@ -67,7 +90,7 @@ v1.1 to v2.0 migration guide
 
   - Django >= 1.4, < 1.5
 
-  - django_compress >= 1.1, < 1.2
+  - django_compressor >= 1.1, < 1.2
 
 - Settings:
 
@@ -79,7 +102,7 @@ v1.1 to v2.0 migration guide
   - Removed ``COMICS_MEDIA_ROOT`` and ``COMICS_MEDIA_URL``. As static files
     now are located under ``STATIC_ROOT`` and ``STATIC_URL``, the entire
     namespace under ``MEDIA_ROOT`` and ``MEDIA_URL`` are now available for
-    downloaded media, like crawled comics.
+    downloaded media, e.g. crawled comics.
 
 - Commands:
 
@@ -100,8 +123,89 @@ v1.1 to v2.0 migration guide
     ``comics/wsgi/__init__.py`` to follow the new default structure in Django
     1.4. Remember to update your web server configuration.
 
+- As the comic sets functionality have been replaced, the app ``comics.sets``
+  is no longer activated by default. If you're upgrading from comics v1.x and
+  have existing sets in your database, you *should* activate the
+  ``comics.sets`` app so that your users may import their old comic sets into
+  their new user accounts. Add the following to your local settings file,
+  ``comics/settings/local.py``::
+
+      from comics.settings.base import INSTALLED_APPS
+      INSTALLED_APPS += ('comics.sets',)
+
 - Renamed :class:`MetaBase` to :class:`ComicDataBase`, and moved it to
   :mod:`comics.core.comic_data`. Remember to update any custom crawlers.
+
+- Database changes:
+
+  - The field :attr:`Comic.number_of_sets` have been removed as it is no longer
+    used.  If you would want to rollback from 2.x to 1.x the data in this field
+    can be regenerated, as it's only a denormalization of data available
+    elsewhere.
+
+  - The datetime field :attr:`Comic.added` has been added. It is automatically
+    populated with a date in the far past upon database migration.
+
+  - Added two new database indexes to the :class:`Release` model, which both
+    help a lot towards making comics browsing faster. They will be
+    automatically created on database migration.
+
+  All of these changes can be automatically applied to your database. To do so,
+  run::
+
+      python manage.py syncdb --migrate
+
+
+v1.1.6 (2012-06-10)
+===================
+
+**Bugfixes**
+
+- :meth:`LxmlParser.text()` now returns an empty list if :attr:`allow_multiple`
+  is :class:`True` and :attr:`default` is not specified. This is identical to
+  how all other :class:`LxmlParser` selector methods already work.
+
+**Crawlers**
+
+- New: ``oatmeal``
+- New: ``zelda``
+- Update: ``abstrusegoose`` has a schedule.
+- Update: ``apokalips`` is no longer published.
+- Update: ``asofterworld`` after feed change.
+- Update: ``atheistcartoons`` is no longer published.
+- Update: ``axecop`` has a schedule.
+- Update: ``basicinstructions`` has a new schedule.
+- Update: ``bgobt`` is no longer published.
+- Update: ``boasas`` is no longer published.
+- Update: ``bunny`` is no longer published.
+- Update: ``carpediem`` is no longer published.
+- Update: ``countyoursheep`` is no longer published.
+- Update: ``crfh`` after site change.
+- Update: ``darklegacy`` does not follow a schedule.
+- Update: ``devilbear`` does not follow a schedule.
+- Update: ``dieselsweetiesweb`` to be more robust to missing elements in the
+  feed.
+- Update: ``goblins`` does not follow a schedule.
+- Update: ``gunshow`` has a new release schedule.
+- Update: ``hijinksensue`` after feed change.
+- Update: ``icanbarelydraw`` has a new release schedule.
+- Update: ``kiwiblitz`` does not follow a schedule.
+- Update: ``littlegamers`` does not follow a schedule.
+- Update: ``m`` is no longer published.
+- Update: ``magpieluck`` is no longer published.
+- Update: ``pcweenies`` does not follow a schedule.
+- Update: ``picturesforsadchildren`` after feed change.
+- Update: ``radiogaga`` has a new release schedule.
+- Update: ``rhymeswithwitch`` is no longer published.
+- Update: ``spaceavalanche`` after feed change.
+- Update: ``stuffnoonetoldme`` is no longer published.
+- Update: ``subnormality`` got a sensible history capability.
+- Update: ``tehgladiators`` does not follow a schedule.
+- Update: ``theidlestate`` does not follow a schedule.
+- Update: ``utensokker`` is no longer published.
+- Update: ``uvod`` got an updated homepage address.
+- Update: ``virtualshackles`` does not follow a schedule.
+- Update: ``walkoflife`` does not follow a schedule.
 
 
 v1.1.5 (2012-05-09)

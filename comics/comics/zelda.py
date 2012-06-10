@@ -1,20 +1,20 @@
-# encoding: utf-8
-
 from comics.aggregator.crawler import CrawlerBase, CrawlerImage
 from comics.core.comic_data import ComicDataBase
 
 class ComicData(ComicDataBase):
-    name = 'Walk of Life'
+    name = 'Zelda'
     language = 'no'
-    url = 'http://walkoflife.nettserier.no/'
-    start_date = '2008-06-23'
-    rights = 'Trond J. Stavås'
+    url = 'http://www.dagbladet.no/tegneserie/zelda/'
+    start_date = '2012-06-07'
+    rights = 'Lina Neidestam'
 
 class Crawler(CrawlerBase):
-    history_capable_date = '2008-06-23'
+    history_capable_days = 30
     time_zone = 1
 
     def crawl(self, pub_date):
-        url = 'http://walkoflife.nettserier.no/_striper/walkoflife-%s.png' % (
+        page_url = 'http://www.dagbladet.no/tegneserie/zelda/?%s' % (
             self.date_to_epoch(pub_date),)
+        page = self.parse_page(page_url)
+        url = page.src('img#zelda-stripe')
         return CrawlerImage(url)

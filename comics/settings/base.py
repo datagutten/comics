@@ -14,14 +14,13 @@ DATABASES = {
     }
 }
 
-#: Time zone of the server. Used by Django's time zone support
-#: handling in comics
-TIME_ZONE = 'Europe/Oslo'
+#: Default time zone to use when displaying datetimes to users
+TIME_ZONE = 'UTC'
 
 LANGUAGE_CODE = 'en-us'
 
 USE_I18N = False
-USE_L10N = True
+USE_L10N = False
 USE_TZ = True
 
 #: Path on disk to where downloaded media will be stored and served from
@@ -91,7 +90,6 @@ INSTALLED_APPS = (
     'comics.aggregator',
     'comics.browser',
     'comics.help',
-    'comics.sets',
     'comics.status',
 )
 
@@ -181,7 +179,8 @@ REGISTRATION_BACKEND = 'comics.accounts.backends.RegistrationBackend'
 
 ### django-invitation settings
 
-#: Turn invitations off by default, leaving the site open for user registrations
+#: Turn invitations off by default, leaving the site open for user
+#: registrations
 INVITE_MODE = False
 
 #: Number of days an invitation will be valid
@@ -220,6 +219,8 @@ COMICS_IMAGE_BLACKLIST = (
     '0a929bfebf333a16226e0734bbaefe3b85f9c615ff8fb7a777954793788b6e34',
     # Dilbert (bt.no)
     'cde5b71cfb91c05d0cd19f35e325fc1cc9f529dfbce5c6e2583a3aa73d240638',
+    # GoComics
+    '60478320f08212249aefaa3ac647fa182dc7f0d7b70e5691c5f95f9859319bdf',
     # Least I Could Do
     '38eca900236617b2c38768c5e5fa410544fea7a3b79cc1e9bd45043623124dbf',
 )
@@ -240,8 +241,8 @@ COMICS_DEFAULT_TIME_ZONE = 1
 #: if this is set.
 COMICS_GOOGLE_ANALYTICS_CODE = None
 
-#: Number of seconds browsers at the latest view of "My comics" should wait before
-#: they check for new releases again
+#: Number of seconds browsers at the latest view of "My comics" should wait
+#: before they check for new releases again
 COMICS_BROWSER_REFRESH_INTERVAL = 60
 
 #: Number of days a new comic on the site is labeled as new

@@ -47,16 +47,19 @@ var keyboardNavigation = (function () {
             return;
         }
         if ($('#releases').length) {
-            if (event.which == 72 || event.which == 104) { // H or h
+            if (event.which === 63) { // ?
+                event.preventDefault();
+                $('.keyboard-shortcuts.modal').modal();
+            } else if (event.which === 72 || event.which === 104) { // H or h
                 event.preventDefault();
                 goToPreviousPage();
-            } else if (event.which == 74 || event.which == 106) { // J or j
+            } else if (event.which === 74 || event.which === 106) { // J or j
                 event.preventDefault();
                 goToNextRelease();
-            } else if (event.which == 75 || event.which == 107) { // K or k
+            } else if (event.which === 75 || event.which === 107) { // K or k
                 event.preventDefault();
                 goToPreviousRelease();
-            } else if (event.which == 76 || event.which == 108) { // L or l
+            } else if (event.which === 76 || event.which === 108) { // L or l
                 event.preventDefault();
                 goToNextPage();
             }
@@ -120,6 +123,29 @@ var mycomicsToggler = (function () {
     };
 })();
 
+var mycomicsEditor = (function () {
+    return {
+        edit: function (event) {
+            event.preventDefault();
+            $('#cloud .edit-view').show();
+            $('#cloud .show-view').hide();
+        },
+        cancel: function (event) {
+            $('#cloud .show-view').show();
+            $('#cloud .edit-view').hide();
+        }
+    };
+})();
+
+var fullSizeToggler = function (event) {
+    event.preventDefault();
+    if ($('img', this).css('max-width') !== 'none') {
+        $('img', this).css('max-width', 'none');
+    } else {
+        $('img', this).css('max-width', '100%');
+    }
+};
+
 var newReleaseCheck = (function () {
     var secondsBeforeFirstCheck = 60;
 
@@ -170,5 +196,8 @@ $(function () {
     $(document).keypress(keyboardNavigation);
     $('.mycomics-add').click(mycomicsToggler.addComic);
     $('.mycomics-remove').click(mycomicsToggler.removeComic);
+    $('.mycomics-edit').click(mycomicsEditor.edit);
+    $('.mycomics-cancel').click(mycomicsEditor.cancel);
+    $('.release .image a').click(fullSizeToggler);
     newReleaseCheck();
 });

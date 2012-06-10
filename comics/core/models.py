@@ -2,10 +2,9 @@ import datetime
 import os
 
 from django.conf import settings
-from django.db import models
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import reverse
-from django.core.cache import cache
+from django.db import models
 from django.utils import timezone
 
 from comics.core.managers import ComicManager
@@ -38,9 +37,9 @@ class Comic(models.Model):
     rights = models.CharField(max_length=100, blank=True,
         help_text='Author, copyright, and/or licensing information')
 
-    # Automatically populated fields (i.e. for denormalization)
-    number_of_sets = models.PositiveIntegerField(default=0,
-        help_text='Number of sets the comic is in (automatically updated)')
+    # Automatically populated fields
+    added = models.DateTimeField(auto_now_add=True,
+        help_text='Time the comic was added to the site')
 
     objects = ComicManager()
 
@@ -58,23 +57,19 @@ class Comic(models.Model):
         return reverse('comic_website', kwargs={'comic_slug': self.slug})
 
     def is_new(self):
-        first_release = self.release_set.all().order_by('fetched')[:1]
-        if not first_release:
-            return False
-        first_release = first_release[0]
         some_time_ago = timezone.now() - datetime.timedelta(
             days=settings.COMICS_NUM_DAYS_COMIC_IS_NEW)
-        return first_release.fetched > some_time_ago
+        return self.added > some_time_ago
 
 
 class Release(models.Model):
     # Required fields
     comic = models.ForeignKey(Comic)
-    pub_date = models.DateField(verbose_name='publication date')
+    pub_date = models.DateField(verbose_name='publication date', db_index=True)
     images = models.ManyToManyField('Image', related_name='releases')
 
     # Automatically populated fields
-    fetched = models.DateTimeField(auto_now_add=True)
+    fetched = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         db_table = 'comics_release'
@@ -91,28 +86,9 @@ class Release(models.Model):
             'day': self.pub_date.day,
         })
 
-    def get_images_first_release(self):
-        key = 'release_images_first_release:%s' % self.id
-        first = cache.get(key)
-
-        if first is not None:
-            return first
-
-        try:
-            first = self.images.all()[0].get_first_release()
-        except IndexError:
-            return
-
-        cache.set(key, first)
-        return first
-
-    def set_ordered_images(self, images):
-        self._ordered_images = images
-
     def get_ordered_images(self):
         if not getattr(self, '_ordered_images', []):
             self._ordered_images = list(self.images.order_by('id'))
-
         return self._ordered_images
 
 
@@ -148,6 +124,3 @@ class Image(models.Model):
 
     def __unicode__(self):
         return u'%s image %s' % (self.comic, self.checksum)
-
-    def get_first_release(self):
-        return self.releases.select_related('comic').order_by('pub_date')[0]
