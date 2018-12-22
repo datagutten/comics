@@ -1,7 +1,8 @@
+from allauth.account.models import EmailAddress
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from allauth.account.models import EmailAddress
 
 
 def create_user():
@@ -26,8 +27,8 @@ class LoginTest(TestCase):
         response = self.client.get('/accounts/login/')
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn('E-mail', response.content)
-        self.assertIn('Password', response.content)
+        self.assertIn(b'E-mail', response.content)
+        self.assertIn(b'Password', response.content)
 
     def test_successful_login_redirects_to_front_page(self):
         response = self.client.post(
@@ -44,4 +45,6 @@ class LoginTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            'The e-mail address and/or password you specified are not correct.', response.content)
+            b'The e-mail address and/or password '
+            b'you specified are not correct.',
+            response.content)

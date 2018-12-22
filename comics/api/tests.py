@@ -51,23 +51,23 @@ class RootResourceTestCase(TestCase):
         response = self.client.get('/api/v1/', HTTP_ACCEPT='application/xml')
 
         self.assertIn(
-            "<?xml version='1.0' encoding='utf-8'?>", response.content)
+            b"<?xml version='1.0' encoding='utf-8'?>", response.content)
 
     def test_resource_can_return_jsonp(self):
         response = self.client.get('/api/v1/', {'format': 'jsonp'})
 
-        self.assertIn('callback(', response.content)
+        self.assertIn(b'callback(', response.content)
 
     def test_resource_can_return_jsonp_with_custom_callback_name(self):
         response = self.client.get(
             '/api/v1/', {'format': 'jsonp', 'callback': 'foo'})
 
-        self.assertIn('foo(', response.content)
+        self.assertIn(b'foo(', response.content)
 
     def test_resource_returns_jsonp_if_just_given_callback_name(self):
         response = self.client.get('/api/v1/', {'callback': 'foo'})
 
-        self.assertIn('foo(', response.content)
+        self.assertIn(b'foo(', response.content)
 
 
 class UsersResourceTestCase(TestCase):
@@ -84,7 +84,7 @@ class UsersResourceTestCase(TestCase):
         response = self.client.get(
             '/api/v1/users/',
             HTTP_AUTHORIZATION='Basic %s' %
-            base64.encodestring('alice:secret'))
+            base64.encodebytes(b'alice:secret').decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
 
@@ -439,7 +439,7 @@ class SubscriptionsResourceTestCase(TestCase):
             response['Location'],
             '/api/v1/subscriptions/%d/' % subscription.pk)
 
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def test_unsubscribe_from_comic(self):
         sub = Subscription.objects.get(comic__slug='xkcd')
@@ -453,7 +453,7 @@ class SubscriptionsResourceTestCase(TestCase):
             HTTP_AUTHORIZATION='Key s3cretk3y')
 
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
         self.assertEqual(
             1,
