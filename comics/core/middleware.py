@@ -4,8 +4,8 @@ from django.conf import settings
 from django.utils.html import strip_spaces_between_tags
 
 
-RE_MULTISPACE = re.compile(r'\s{2,}')
-RE_NEWLINE = re.compile(r'\n')
+RE_MULTISPACE = re.compile(br'\s{2,}')
+RE_NEWLINE = re.compile(br'\n')
 
 
 def minify_html_middleware(get_response):
@@ -16,7 +16,7 @@ def minify_html_middleware(get_response):
                 settings.COMPRESS_HTML):
             response.content = strip_spaces_between_tags(
                 response.content.strip())
-            response.content = RE_MULTISPACE.sub(' ', response.content)
-            response.content = RE_NEWLINE.sub(' ', response.content)
+            response.content = RE_MULTISPACE.sub(b' ', response.content)
+            response.content = RE_NEWLINE.sub(b' ', response.content)
         return response
     return middleware
