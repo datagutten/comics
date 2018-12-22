@@ -85,7 +85,7 @@ class Release(models.Model):
         get_latest_by = 'pub_date'
 
     def __unicode__(self):
-        return u'Release %s/%s' % (self.comic.slug, self.pub_date)
+        return 'Release %s/%s' % (self.comic.slug, self.pub_date)
 
     def get_absolute_url(self):
         return reverse('comic_day', kwargs={
@@ -109,7 +109,7 @@ image_storage = FileSystemStorage(
 
 
 def image_file_path(instance, filename):
-    return u'%s/%s/%s' % (instance.comic.slug, filename[0], filename)
+    return '%s/%s/%s' % (instance.comic.slug, filename[0], filename)
 
 
 class Image(models.Model):
@@ -133,4 +133,4 @@ class Image(models.Model):
         db_table = 'comics_image'
 
     def __unicode__(self):
-        return u'Image %s/%s...' % (self.comic.slug, self.checksum[:8])
+        return 'Image %s/%s...' % (self.comic.slug, self.checksum[:8])

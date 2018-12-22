@@ -1,9 +1,9 @@
 import datetime
-import httplib
+import http.client
 import json
 import socket
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import xml.sax._exceptions
 
 from django.utils import timezone
@@ -30,7 +30,7 @@ class CrawlerRelease(object):
 
     @property
     def identifier(self):
-        return u'%s/%s' % (self.comic.slug, self.pub_date)
+        return '%s/%s' % (self.comic.slug, self.pub_date)
 
     @property
     def images(self):
@@ -49,10 +49,10 @@ class CrawlerImage(object):
         self.request_headers = headers or {}
 
         # Convert from e.g. lxml.etree._ElementUnicodeResult to unicode
-        if self.title is not None and type(self.title) != unicode:
-            self.title = unicode(self.title)
-        if self.text is not None and type(self.text) != unicode:
-            self.text = unicode(self.text)
+        if self.title is not None and type(self.title) != str:
+            self.title = str(self.title)
+        if self.text is not None and type(self.text) != str:
+            self.text = str(self.text)
 
     def validate(self, identifier):
         if not self.url:
@@ -99,11 +99,11 @@ class CrawlerBase(object):
 
         try:
             results = self.crawl(pub_date)
-        except urllib2.HTTPError as error:
+        except urllib.error.HTTPError as error:
             raise CrawlerHTTPError(release.identifier, error.code)
-        except urllib2.URLError as error:
+        except urllib.error.URLError as error:
             raise CrawlerHTTPError(release.identifier, error.reason)
-        except httplib.BadStatusLine:
+        except http.client.BadStatusLine:
             raise CrawlerHTTPError(release.identifier, 'BadStatusLine')
         except socket.error as error:
             raise CrawlerHTTPError(release.identifier, error)
@@ -124,7 +124,7 @@ class CrawlerBase(object):
         return release
 
     def _get_date_to_crawl(self, pub_date):
-        identifier = u'%s/%s' % (self.comic.slug, pub_date)
+        identifier = '%s/%s' % (self.comic.slug, pub_date)
 
         if pub_date is None:
             pub_date = self.current_date
@@ -290,8 +290,8 @@ class CreatorsCrawlerBase(CrawlerBase):
             'feature_id=%s&year=%s'
         ) % (feature_id, pub_date.year)
 
-        req = urllib2.Request(url, None, self.headers)
-        response = urllib2.urlopen(req)
+        req = urllib.request.Request(url, None, self.headers)
+        response = urllib.request.urlopen(req)
         releases = json.load(response)
         for release in releases:
             if release['release'] == pub_date.strftime('%Y-%m-%d'):

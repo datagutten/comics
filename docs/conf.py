@@ -18,8 +18,8 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = u'comics'
-copyright = u'2009-2017, Stein Magnus Jodal'
+project = 'comics'
+copyright = '2009-2017, Stein Magnus Jodal'
 
 version = '3.0'
 release = '3.0.0'
