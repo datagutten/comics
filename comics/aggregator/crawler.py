@@ -202,6 +202,8 @@ class KingFeaturesCrawlerBase(CrawlerBase):
         page_url = 'http://%s/comics/%s' % (domain, date)
         page = self.parse_page(page_url)
         url = page.src('img[src*="safr.kingfeatures.com"]')
+        # King Features has weak https ciphers causing download to fail
+        url = url.replace('https', 'http')
         return CrawlerImage(url)
 
 
