@@ -29,7 +29,7 @@ class UserProfile(models.Model):
         db_table = 'comics_user_profile'
         verbose_name = 'comics profile'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Comics profile for %s' % self.user.email
 
     def generate_new_secret_key(self):
@@ -43,6 +43,6 @@ class Subscription(models.Model):
     class Meta:
         db_table = 'comics_user_profile_comics'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Subscription for %s to %s' % (
             self.userprofile.user.email, self.comic.slug)

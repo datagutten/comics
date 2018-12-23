@@ -56,7 +56,7 @@ class Comic(models.Model):
         db_table = 'comics_comic'
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slug
 
     def get_absolute_url(self):
@@ -84,7 +84,7 @@ class Release(models.Model):
         db_table = 'comics_release'
         get_latest_by = 'pub_date'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Release %s/%s' % (self.comic.slug, self.pub_date)
 
     def get_absolute_url(self):
@@ -132,5 +132,5 @@ class Image(models.Model):
     class Meta:
         db_table = 'comics_image'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Image %s/%s...' % (self.comic.slug, self.checksum[:8])
