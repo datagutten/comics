@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf import settings
 from django.db import models, migrations
 
@@ -36,11 +33,11 @@ class Migration(migrations.Migration):
                 ('secret_key',
                     models.CharField(
                         default=comics.accounts.models.make_secret_key,
-                        help_text=b'Secret key for feed and API access',
+                        help_text='Secret key for feed and API access',
                         max_length=32)),
                 ('comics', models.ManyToManyField(to='core.Comic',
                     through='accounts.Subscription')),
-                ('user', models.OneToOneField(related_name=b'comics_profile',
+                ('user', models.OneToOneField(related_name='comics_profile',
                     to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
