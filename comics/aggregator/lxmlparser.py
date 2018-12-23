@@ -96,7 +96,7 @@ class LxmlParser(object):
         content = handle.read()
         self._retrieved_url = handle.geturl()
         handle.close()
-        content = content.replace('\x00', '')
+        content = content.replace(b'\x00', b'')
         root = self._parse_string(content)
         root.make_links_absolute(self._retrieved_url)
         return root
@@ -107,7 +107,7 @@ class LxmlParser(object):
         return fromstring(string)
 
     def _decode(self, string):
-        if isinstance(string, str):
+        if isinstance(string, bytes):
             try:
                 string = string.decode('utf-8')
             except UnicodeDecodeError:
