@@ -15,7 +15,7 @@ def minify_html_middleware(get_response):
                 'text/html' in response.get('Content-Type', '') and
                 settings.COMPRESS_HTML):
             response.content = strip_spaces_between_tags(
-                response.content.strip())
+                response.content.strip().decode('utf-8'))
             response.content = RE_MULTISPACE.sub(b' ', response.content)
             response.content = RE_NEWLINE.sub(b' ', response.content)
         return response
