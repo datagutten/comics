@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import datetime
 import warnings
@@ -42,12 +42,12 @@ class Entry(object):
 
     def __getattr__(self, name):
         attr = getattr(self.raw_entry, name)
-        if isinstance(attr, str) and self.encoding is not None:
+        if isinstance(attr, bytes) and self.encoding is not None:
             attr = attr.decode(self.encoding)
         return attr
 
     def html(self, string):
-        if isinstance(string, str) and self.encoding is not None:
+        if isinstance(string, bytes) and self.encoding is not None:
             string = string.decode(self.encoding)
         return LxmlParser(string=string)
 

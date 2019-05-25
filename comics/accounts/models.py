@@ -18,7 +18,8 @@ def make_secret_key():
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, related_name='comics_profile')
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='comics_profile')
     secret_key = models.CharField(
         max_length=32, blank=False, default=make_secret_key,
         help_text='Secret key for feed and API access')
@@ -28,20 +29,20 @@ class UserProfile(models.Model):
         db_table = 'comics_user_profile'
         verbose_name = 'comics profile'
 
-    def __unicode__(self):
-        return u'Comics profile for %s' % self.user.email
+    def __str__(self):
+        return 'Comics profile for %s' % self.user.email
 
     def generate_new_secret_key(self):
         self.secret_key = make_secret_key()
 
 
 class Subscription(models.Model):
-    userprofile = models.ForeignKey(UserProfile)
-    comic = models.ForeignKey(Comic)
+    userprofile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    comic = models.ForeignKey(Comic, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'comics_user_profile_comics'
 
-    def __unicode__(self):
-        return u'Subscription for %s to %s' % (
+    def __str__(self):
+        return 'Subscription for %s to %s' % (
             self.userprofile.user.email, self.comic.slug)

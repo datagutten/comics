@@ -3,8 +3,8 @@ import os
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 from comics.core.managers import ComicManager
@@ -56,7 +56,7 @@ class Comic(models.Model):
         db_table = 'comics_comic'
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slug
 
     def get_absolute_url(self):
@@ -73,7 +73,7 @@ class Comic(models.Model):
 
 class Release(models.Model):
     # Required fields
-    comic = models.ForeignKey(Comic)
+    comic = models.ForeignKey(Comic, on_delete=models.CASCADE)
     pub_date = models.DateField(verbose_name='publication date', db_index=True)
     images = models.ManyToManyField('Image', related_name='releases')
 
@@ -84,8 +84,8 @@ class Release(models.Model):
         db_table = 'comics_release'
         get_latest_by = 'pub_date'
 
-    def __unicode__(self):
-        return u'Release %s/%s' % (self.comic.slug, self.pub_date)
+    def __str__(self):
+        return 'Release %s/%s' % (self.comic.slug, self.pub_date)
 
     def get_absolute_url(self):
         return reverse('comic_day', kwargs={
@@ -102,19 +102,19 @@ class Release(models.Model):
 
 
 # Let all created dirs and files be writable by the group
-os.umask(0002)
+os.umask(0o002)
 
 image_storage = FileSystemStorage(
     location=settings.MEDIA_ROOT, base_url=settings.MEDIA_URL)
 
 
 def image_file_path(instance, filename):
-    return u'%s/%s/%s' % (instance.comic.slug, filename[0], filename)
+    return '%s/%s/%s' % (instance.comic.slug, filename[0], filename)
 
 
 class Image(models.Model):
     # Required fields
-    comic = models.ForeignKey(Comic)
+    comic = models.ForeignKey(Comic, on_delete=models.CASCADE)
     file = models.ImageField(
         storage=image_storage, upload_to=image_file_path,
         height_field='height', width_field='width')
@@ -132,5 +132,5 @@ class Image(models.Model):
     class Meta:
         db_table = 'comics_image'
 
-    def __unicode__(self):
-        return u'Image %s/%s...' % (self.comic.slug, self.checksum[:8])
+    def __str__(self):
+        return 'Image %s/%s...' % (self.comic.slug, self.checksum[:8])

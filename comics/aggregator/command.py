@@ -16,17 +16,17 @@ def log_errors(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ComicsError, error:
+        except ComicsError as error:
             logger.info(error)
-        except Exception, error:
-            logger.exception(u'%s: %s', args[0].identifier, error)
+        except Exception as error:
+            logger.exception('%s: %s', args[0].identifier, error)
     return inner
 
 
 class Aggregator(object):
-    def __init__(self, config=None, optparse_options=None):
-        if config is None and optparse_options is not None:
-            self.config = AggregatorConfig(optparse_options)
+    def __init__(self, config=None, options=None):
+        if config is None and options is not None:
+            self.config = AggregatorConfig(options)
         else:
             assert isinstance(config, AggregatorConfig)
             self.config = config
@@ -52,7 +52,7 @@ class Aggregator(object):
                 '%s: Crawling from %s to %s', comic.slug, from_date, to_date)
         pub_date = from_date
         while pub_date <= to_date:
-            self.identifier = u'%s/%s' % (comic.slug, pub_date)
+            self.identifier = '%s/%s' % (comic.slug, pub_date)
             crawler_release = self._crawl_one_comic_one_date(crawler, pub_date)
             if crawler_release:
                 self._download_release(crawler_release)

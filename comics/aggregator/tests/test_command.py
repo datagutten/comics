@@ -21,9 +21,9 @@ class AggregatorConfigTestCase(TestCase):
         self.cc = command.AggregatorConfig()
 
     def test_init(self):
-        self.assertEquals(0, len(self.cc.comics))
-        self.assertEquals(None, self.cc.from_date)
-        self.assertEquals(None, self.cc.to_date)
+        self.assertEqual(0, len(self.cc.comics))
+        self.assertEqual(None, self.cc.from_date)
+        self.assertEqual(None, self.cc.to_date)
 
     def test_init_invalid(self):
         self.assertRaises(
@@ -32,22 +32,22 @@ class AggregatorConfigTestCase(TestCase):
     def test_set_from_date(self):
         from_date = datetime.date(2008, 3, 11)
         self.cc._set_from_date(from_date)
-        self.assertEquals(from_date, self.cc.from_date)
+        self.assertEqual(from_date, self.cc.from_date)
 
     def test_set_from_date_from_string(self):
         from_date = datetime.date(2008, 3, 11)
         self.cc._set_from_date(str(from_date))
-        self.assertEquals(from_date, self.cc.from_date)
+        self.assertEqual(from_date, self.cc.from_date)
 
     def test_set_to_date(self):
         to_date = datetime.date(2008, 3, 11)
         self.cc._set_to_date(to_date)
-        self.assertEquals(to_date, self.cc.to_date)
+        self.assertEqual(to_date, self.cc.to_date)
 
     def test_set_to_date_from_string(self):
         to_date = datetime.date(2008, 3, 11)
         self.cc._set_to_date(str(to_date))
-        self.assertEquals(to_date, self.cc.to_date)
+        self.assertEqual(to_date, self.cc.to_date)
 
     def test_validate_dates_valid(self):
         self.cc.from_date = datetime.date(2008, 3, 11)
@@ -66,7 +66,7 @@ class AggregatorConfigTestCase(TestCase):
     def test_get_comic_by_slug_valid(self):
         expected = Comic.objects.get(slug='xkcd')
         result = self.cc._get_comic_by_slug('xkcd')
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_get_comic_by_slug_invalid(self):
         self.assertRaises(ComicsError, self.cc._get_comic_by_slug, 'not slug')
@@ -75,18 +75,18 @@ class AggregatorConfigTestCase(TestCase):
         comic1 = Comic.objects.get(slug='xkcd')
         comic2 = Comic.objects.get(slug='sinfest')
         self.cc.set_comics_to_crawl(['xkcd', 'sinfest'])
-        self.assertEquals(2, len(self.cc.comics))
-        self.assert_(comic1 in self.cc.comics)
-        self.assert_(comic2 in self.cc.comics)
+        self.assertEqual(2, len(self.cc.comics))
+        self.assertTrue(comic1 in self.cc.comics)
+        self.assertTrue(comic2 in self.cc.comics)
 
     def test_set_comics_to_crawl_all(self):
         all_count = Comic.objects.count()
 
         self.cc.set_comics_to_crawl(None)
-        self.assertEquals(all_count, len(self.cc.comics))
+        self.assertEqual(all_count, len(self.cc.comics))
 
         self.cc.set_comics_to_crawl([])
-        self.assertEquals(all_count, len(self.cc.comics))
+        self.assertEqual(all_count, len(self.cc.comics))
 
 
 class ComicAggregatorTestCase(TestCase):
@@ -106,20 +106,20 @@ class ComicAggregatorTestCase(TestCase):
     def test_init(self):
         self.assertIsInstance(self.aggregator.config, command.AggregatorConfig)
 
-    def test_init_optparse_config(self):
-        optparse_options_mock = mock.Mock()
-        optparse_options_mock.comic_slugs = None
-        optparse_options_mock.from_date = None
-        optparse_options_mock.to_date = None
-        optparse_options_mock.get.return_value = None
+    def test_init_options(self):
+        options_mock = mock.Mock()
+        options_mock.comic_slugs = None
+        options_mock.from_date = None
+        options_mock.to_date = None
+        options_mock.get.return_value = None
 
-        result = command.Aggregator(optparse_options=optparse_options_mock)
+        result = command.Aggregator(options=options_mock)
 
-        self.assertEquals(
+        self.assertEqual(
             len(self.aggregator.config.comics), len(result.config.comics))
-        self.assertEquals(
+        self.assertEqual(
             self.aggregator.config.from_date, result.config.from_date)
-        self.assertEquals(
+        self.assertEqual(
             self.aggregator.config.to_date, result.config.to_date)
 
     def test_init_invalid_config(self):
@@ -154,7 +154,7 @@ class ComicAggregatorTestCase(TestCase):
         result = self.aggregator._get_valid_date(
             self.crawler_mock, datetime.date(2008, 2, 1))
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_get_valid_date_from_config(self):
         expected = datetime.date(2008, 3, 1)
@@ -165,7 +165,7 @@ class ComicAggregatorTestCase(TestCase):
         result = self.aggregator._get_valid_date(
             self.crawler_mock, expected)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_get_crawler(self):
         pass  # TODO
