@@ -4,12 +4,13 @@ import json
 import re
 import socket
 import time
-import urllib.request, urllib.error, urllib.parse
+import urllib.error
+import urllib.parse
+import urllib.request
 import xml.sax._exceptions
 
-from django.utils import timezone
-
 import pytz
+from django.utils import timezone
 
 from comics.aggregator.exceptions import (
     CrawlerHTTPError, ImageURLNotFound, NotHistoryCapable,
