@@ -1,10 +1,10 @@
 language: python
 
 python:
-- '2.7'
+- '3.8'
 
 env:
-- TOX_ENV=py27
+- TOX_ENV=py38
 - TOX_ENV=docs
 - TOX_ENV=flake8
 
