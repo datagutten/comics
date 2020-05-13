@@ -88,12 +88,6 @@ class ImageDownloader(object):
 
     def _download_image(self, url, request_headers):
         try:
-            if isinstance(url, str):
-                # Ideally, we should keep the URLs in the original encoding or
-                # URI encoded all the way through the system. If we get Unicode
-                # strings here, our best guess is to encode them as UTF-8 so
-                # urllib2 can URI encode them properly.
-                url = url.encode('utf-8')
             request = urllib.request.Request(url, None, request_headers)
             with contextlib.closing(urllib.request.urlopen(request)) as http_file:
                 temp_file = tempfile.NamedTemporaryFile(suffix='comics')
