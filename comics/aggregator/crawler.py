@@ -331,6 +331,8 @@ class StartsidenCrawlerBase(CrawlerBase):
     comic_name = None
 
     def load_articles(self, limit=500):
+        if self.comic_name not in self.article_cache:
+            self.article_cache[self.comic_name] = {}
 
         url = 'https://article-ws.startsiden.no/articles/comic?limit=%d&page=1&preview=false' % limit
 
@@ -352,17 +354,17 @@ class StartsidenCrawlerBase(CrawlerBase):
             article_time = datetime.date.fromtimestamp(article['pubTimestamp'] / 1000)
             article_time = article_time.strftime('%Y-%m-%d')
 
-            self.article_cache[article_time] = article
+            self.article_cache[self.comic_name][article_time] = article
 
     def crawl_helper(self, pub_date):
         # Load articles only once
-        if self.article_cache == {}:
+        if self.comic_name not in self.article_cache:
             self.load_articles()
 
         pub_date_string = pub_date.strftime('%Y-%m-%d')
-        if pub_date_string not in self.article_cache:
+        if pub_date_string not in self.article_cache[self.comic_name]:
             # print('No article found for %s' % pub_date)
             return
         else:
-            article = self.article_cache[pub_date_string]
+            article = self.article_cache[self.comic_name][pub_date_string]
             return CrawlerImage(article['image']['url'], article['title'])
