@@ -12,9 +12,9 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(DagbladetCrawlerBase):
-    history_capable_date = '2017-03-16'
-    schedule = 'Mo,Tu,We,Th,Fr'
-    time_zone = 'Europe/Oslo'
+    history_capable_days = 30  # 3 saturdays
+    schedule = "Sa"
+    time_zone = "Europe/Oslo"
 
     def crawl(self, pub_date):
         return self.crawl_helper('dunce', pub_date)
