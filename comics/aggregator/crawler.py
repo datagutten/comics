@@ -1,6 +1,7 @@
 import datetime
 import httplib
 import json
+import re
 import socket
 import time
 import urllib2
@@ -319,3 +320,51 @@ class NettserierCrawlerBase(CrawlerBase):
             text = comic_text.find('p').text
             url = page.src('img[src*="/_ns/files"]')
             return CrawlerImage(url, title, text)
+
+
+class StartsidenCrawlerBase(CrawlerBase):
+    """Base comics crawler for all comics posted at startsiden.no"""
+    time_zone = 'Europe/Oslo'
+    article_cache = {}
+    comic_name = None
+
+    def load_articles(self, limit=500):
+        if self.comic_name not in self.article_cache:
+            self.article_cache[self.comic_name] = {}
+
+        url = 'https://article-ws.startsiden.no/articles/' \
+              'comic?limit=%d&page=1&preview=false' % limit
+
+        req = urllib2.Request(url, None, self.headers)
+        response = urllib2.urlopen(req)
+        releases = json.load(response)
+
+        for article in releases['articles']:
+            matches = re.match(r'%s(?: [-–]\s?(.+))?' %
+                               self.comic_name,
+                               article['title'])
+            if not matches:
+                if article['title'].find(self.comic_name) > -1:
+                    print('No matches: %s' % article['title'])
+                continue
+            else:
+                article['title'] = matches.group(1)
+
+            article_time = datetime.date.fromtimestamp(
+                article['pubTimestamp'] / 1000)
+            article_time = article_time.strftime('%Y-%m-%d')
+
+            self.article_cache[self.comic_name][article_time] = article
+
+    def crawl_helper(self, pub_date):
+        # Load articles only once
+        if self.comic_name not in self.article_cache:
+            self.load_articles()
+
+        pub_date_string = pub_date.strftime('%Y-%m-%d')
+        if pub_date_string not in self.article_cache[self.comic_name]:
+            # print('No article found for %s' % pub_date)
+            return
+        else:
+            article = self.article_cache[self.comic_name][pub_date_string]
+            return CrawlerImage(article['image']['url'], article['title'])
