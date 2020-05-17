@@ -3,11 +3,12 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'you and me and cats'
-    language = 'en'
-    url = 'http://strawberry-pie.net/SA/'
-    start_date = '2009-07-01'
-    rights = 'bubble'
+    name = "you and me and cats"
+    language = "en"
+    url = "http://strawberry-pie.net/SA/"
+    start_date = "2009-07-01"
+    rights = "bubble"
+    active = False
 
 
 class Crawler(CrawlerBase):
@@ -15,11 +16,4 @@ class Crawler(CrawlerBase):
     time_zone = 'US/Pacific'
 
     def crawl(self, pub_date):
-        feed = self.parse_feed('http://strawberry-pie.net/SA/?feed=rss2')
-        for entry in feed.for_date(pub_date):
-            if 'comic' not in entry.tags:
-                continue
-            url = entry.summary.src('img')
-            url = url.replace('comics-rss', 'comics')
-            title = entry.title
-            return CrawlerImage(url, title)
+        pass
