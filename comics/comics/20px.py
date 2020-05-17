@@ -3,11 +3,12 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Twenty Pixels'
-    language = 'en'
-    url = 'http://20px.com/'
-    start_date = '2011-02-11'
-    rights = 'Angela'
+    name = "Twenty Pixels"
+    language = "en"
+    url = "http://20px.com/"
+    start_date = "2011-02-11"
+    rights = "Angela"
+    active = False
 
 
 class Crawler(CrawlerBase):
