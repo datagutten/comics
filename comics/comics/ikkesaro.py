@@ -3,10 +3,11 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Ikke Saro'
-    language = 'no'
-    url = 'http://ikkesaro.nettserier.no/'
-    rights = 'Ladder'
+    name = "Ikke Saro"
+    language = "no"
+    url = "http://ikkesaro.nettserier.no/"
+    rights = "Ladder"
+    active = False
 
 
 class Crawler(NettserierCrawlerBase):
