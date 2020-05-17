@@ -7,6 +7,13 @@ env:
 - TOX_ENV=py38
 - TOX_ENV=docs
 - TOX_ENV=flake8
+- TOX_ENV=crawlers
+
+jobs:
+  allow_failures:
+    - env:
+        - TOX_ENV=flake8
+        - TOX_ENV=crawlers
 
 install:
 - pip install tox
