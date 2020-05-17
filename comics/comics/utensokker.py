@@ -4,11 +4,12 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Uten Sokker'
-    language = 'no'
-    url = 'http://utensokker.nettserier.no/'
-    start_date = '2009-07-14'
-    rights = 'Bjørnar Grandalen'
+    name = "Uten Sokker"
+    language = "no"
+    url = "http://utensokker.nettserier.no/"
+    start_date = "2009-07-14"
+    rights = "Bjørnar Grandalen"
+    active = False
 
 
 class Crawler(NettserierCrawlerBase):
