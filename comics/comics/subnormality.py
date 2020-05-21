@@ -5,11 +5,13 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Subnormality'
-    language = 'en'
-    url = 'http://www.viruscomix.com/subnormality.html'
-    start_date = '2007-01-01'
-    rights = 'Winston Rowntree'
+    name = "Subnormality"
+    language = "en"
+    url = "http://www.viruscomix.com/subnormality.html"
+    start_date = "2007-01-01"
+    end_date = '2019-06-07'
+    rights = "Winston Rowntree"
+    active = False
 
 
 class Crawler(CrawlerBase):
