@@ -61,7 +61,7 @@ class CrawlersTestCase(TestCase):
         comic = Comic.objects.get(slug=slug)
         module = get_comic_module(slug)
         crawler = module.Crawler(comic)
-        pub_date = datetime.today()
+        pub_date = datetime.today().date()
 
         try:
             images = crawler.crawl(pub_date)
