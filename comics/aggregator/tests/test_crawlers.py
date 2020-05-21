@@ -1,3 +1,6 @@
+import os
+import sys
+from time import strptime
 from urllib.error import HTTPError
 
 from ddt import ddt, idata
@@ -15,9 +18,17 @@ def get_crawler(slug):
     return module.Crawler(comic)
 
 
+def get_comics():
+    comics = get_comic_module_names()
+    if 'COMIC' in os.environ and os.environ['COMIC'] in comics:
+        return [os.environ['COMIC']]
+    else:
+        return comics
+
+
 def get_history_capable_date():
     comics = []
-    for slug in get_comic_module_names():
+    for slug in get_comics():
         module = get_comic_module(slug)
         if module.Crawler.history_capable_date is not None:
             comics.append(slug)
@@ -27,7 +38,7 @@ def get_history_capable_date():
 
 def get_history_capable_days():
     comics = []
-    for slug in get_comic_module_names():
+    for slug in get_comics():
         module = get_comic_module(slug)
         # crawler = module.Crawler(comic)
         if module.Crawler.history_capable_days is not None:
@@ -36,10 +47,10 @@ def get_history_capable_days():
 
 @ddt
 class CrawlersTestCase(TestCase):
-    @idata(get_comic_module_names())
+    @idata(get_comics())
     def test_crawl(self, slug):
         options = {'comic_slugs': [slug]}
-        print('Crawl %s' % slug)
+        # print('Crawl %s' % slug)
         data_loader = ComicDataLoader(options)
         data_loader.start()
 
