@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 from time import strptime
 from urllib.error import HTTPError
 
@@ -60,8 +61,7 @@ class CrawlersTestCase(TestCase):
         comic = Comic.objects.get(slug=slug)
         module = get_comic_module(slug)
         crawler = module.Crawler(comic)
-        pub_date = crawler.history_capable
-
+        pub_date = datetime.today()
 
         try:
             images = crawler.crawl(pub_date)
@@ -79,7 +79,7 @@ class CrawlersTestCase(TestCase):
                 images = [images]
             for image in images:
                 self.assertIsInstance(image, CrawlerImage)
-                self.assertIsNotNone(image.url, 'Crawler returned image without URL')
+                self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % pub_date)
 
     @idata(get_history_capable_date())
     def test_history_capability(self, slug):
