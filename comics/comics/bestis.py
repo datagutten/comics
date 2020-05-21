@@ -5,10 +5,10 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Bestis'
-    language = 'no'
-    url = 'http://www.dagbladet.no/tegneserie/bestis/'
-    rights = 'Kenneth Larsen'
+    name = "Bestis"
+    language = "no"
+    url = "http://www.dagbladet.no/tegneserie/bestis/"
+    rights = "Kenneth Larsen"
 
 
 class Crawler(DagbladetCrawlerBase):
@@ -17,4 +17,4 @@ class Crawler(DagbladetCrawlerBase):
     time_zone = "Europe/Oslo"
 
     def crawl(self, pub_date):
-        return self.crawl_helper('bestis', pub_date)
+        return self.crawl_helper("bestis", pub_date)

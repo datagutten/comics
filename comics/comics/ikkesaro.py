@@ -11,8 +11,8 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(NettserierCrawlerBase):
-    history_capable_date = '2016-06-16'
-    time_zone = 'Europe/Oslo'
+    history_capable_date = "2016-06-16"
+    time_zone = "Europe/Oslo"
 
     def crawl(self, pub_date):
-        return self.crawl_helper('ikkesaro', pub_date)
+        return self.crawl_helper("ikkesaro", pub_date)

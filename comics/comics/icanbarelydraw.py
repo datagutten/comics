@@ -13,18 +13,18 @@ class ComicData(ComicDataBase):
 
 class Crawler(CrawlerBase):
     history_capable_days = 180
-    schedule = 'Mo'
-    time_zone = 'US/Pacific'
+    schedule = "Mo"
+    time_zone = "US/Pacific"
 
     # Without User-Agent set, the server returns 403 Forbidden
-    headers = {'User-Agent': 'Mozilla/4.0'}
+    headers = {"User-Agent": "Mozilla/4.0"}
 
     def crawl(self, pub_date):
-        feed = self.parse_feed('http://www.icanbarelydraw.com/comic/feed')
+        feed = self.parse_feed("http://www.icanbarelydraw.com/comic/feed")
         for entry in feed.for_date(pub_date):
             url = entry.summary.src('img[src*="/comics-rss/"]')
             if url is None:
                 continue
-            url = url.replace('/comics-rss/', '/comics/')
+            url = url.replace("/comics-rss/", "/comics/")
             title = entry.title
             return CrawlerImage(url, title)

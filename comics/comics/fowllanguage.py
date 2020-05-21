@@ -3,11 +3,11 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Fowl Language'
-    language = 'en'
-    url = 'http://www.fowllanguagecomics.com/'
-    start_date = '2013-07-22'
-    rights = 'Brian Gordon'
+    name = "Fowl Language"
+    language = "en"
+    url = "http://www.fowllanguagecomics.com/"
+    start_date = "2013-07-22"
+    rights = "Brian Gordon"
 
 
 class Crawler(CrawlerBase):

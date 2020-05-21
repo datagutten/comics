@@ -5,17 +5,17 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Optipess'
-    language = 'en'
-    url = 'http://www.optipess.com/'
-    start_date = '2008-12-01'
-    rights = 'Kristian Nygård'
+    name = "Optipess"
+    language = "en"
+    url = "http://www.optipess.com/"
+    start_date = "2008-12-01"
+    rights = "Kristian Nygård"
 
 
 class Crawler(CrawlerBase):
-    history_capable_date = '2008-12-01'
-    schedule = 'Mo,Fr'
-    time_zone = 'Europe/Oslo'
+    history_capable_date = "2008-12-01"
+    schedule = "Mo,Fr"
+    time_zone = "Europe/Oslo"
 
     def crawl(self, pub_date):
         # Find the post for the requested date

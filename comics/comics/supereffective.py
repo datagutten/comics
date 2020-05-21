@@ -12,13 +12,14 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(CrawlerBase):
-    history_capable_date = '2008-04-23'
-    time_zone = 'US/Eastern'
+    history_capable_date = "2008-04-23"
+    time_zone = "US/Eastern"
 
     # Without User-Agent set, the server returns empty responses
-    headers = {'User-Agent': 'Mozilla/4.0'}
+    headers = {"User-Agent": "Mozilla/4.0"}
 
     def crawl(self, pub_date):
-        url = 'http://www.vgcats.com/super/images/%s.gif' % (
-            pub_date.strftime('%y%m%d'),)
+        url = "http://www.vgcats.com/super/images/%s.gif" % (
+            pub_date.strftime("%y%m%d"),
+        )
         return CrawlerImage(url)

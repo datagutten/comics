@@ -16,4 +16,4 @@ class Crawler(DagbladetCrawlerBase):
     time_zone = "Europe/Oslo"
 
     def crawl(self, pub_date):
-        return self.crawl_helper('rutetid', pub_date)
+        return self.crawl_helper("rutetid", pub_date)
