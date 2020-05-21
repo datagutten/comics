@@ -3,40 +3,41 @@ from comics.core.comic_data import ComicDataBase
 
 
 class ComicData(ComicDataBase):
-    name = 'Awkward Zombie'
-    language = 'en'
-    url = 'http://www.awkwardzombie.com/'
-    start_date = '2006-09-20'
-    rights = 'Katie Tiedrich'
+    name = "Awkward Zombie"
+    language = "en"
+    url = "http://www.awkwardzombie.com/"
+    start_date = "2006-09-20"
+    rights = "Katie Tiedrich"
 
 
 class Crawler(CrawlerBase):
-    history_capable_date = '2006-09-20'
-    schedule = 'Mo'
-    time_zone = 'US/Eastern'
-
-    # Without User-Agent set, the server returns 403 Forbidden
-    headers = {'User-Agent': 'Mozilla/4.0'}
+    history_capable_date = "2006-09-19"
+    schedule = "Mo"
+    time_zone = "US/Eastern"
+    archive_page = None
 
     def crawl(self, pub_date):
-        page = self.parse_page(
-            pub_date.strftime('http://www.awkwardzombie.com/?comic=%m%d%y'))
+        if not self.archive_page:
+            page_url = "https://www.awkwardzombie.com/awkward-zombie/archive/"
+            self.archive_page = self.parse_page(page_url)
 
-        page_date = page.text('#date').strip()
-        page_date = page_date.replace('st,', ',')
-        page_date = page_date.replace('nd,', ',')
-        page_date = page_date.replace('rd,', ',')
-        page_date = page_date.replace('th,', ',')
-        try:
-            page_date = self.string_to_date(page_date, '%B %d, %Y')
-        except ValueError:
+        release = self.archive_page.root.xpath(
+            "//div[(@class='archive-date') and contains(.,'%s')]/.."
+            % pub_date.strftime("%m-%d-%y")
+        )
+        if not release:
             return
-        if page_date != pub_date:
-            return
+        release = release[0]
+        title = release.xpath("div[@class='archive-title']/a")
+        title = title[0]
+        game = release.xpath("div[@class='archive-game']/a")
+        game = game[0].text
 
-        result = [
-            CrawlerImage(url)
-            for url in page.src('#comic img', allow_multiple=True)]
-        if result:
-            result[0].title = page.text('.title').strip()
-        return result
+        link = title.get("href")
+        title = title.text
+        release_page = self.parse_page(link)
+
+        img = release_page.root.xpath("//img[@id='cc-comic']")
+        url = img[0].get("src")
+
+        return CrawlerImage(url, title, game)
