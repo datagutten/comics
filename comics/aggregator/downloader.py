@@ -1,6 +1,6 @@
 import hashlib
 import socket
-import tempfile
+from io import BytesIO
 
 import requests
 
@@ -87,13 +87,9 @@ class ImageDownloader(object):
 
     def _download_image(self, url, request_headers):
         try:
-            response = requests.get(url, headers=request_headers, stream=True)
+            response = requests.get(url, headers=request_headers)
             response.raise_for_status()
-            temp_file = tempfile.NamedTemporaryFile(suffix="comics")
-            with open(temp_file, "wb") as fd:
-                for chunk in response.iter_content(chunk_size=128):
-                    fd.write(chunk)
-                return temp_file
+            return BytesIO(response.content)
 
         except requests.RequestException as error:
             raise DownloaderHTTPError(self.identifier, error.errno)
