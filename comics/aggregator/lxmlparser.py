@@ -89,9 +89,8 @@ class LxmlParser(object):
     def _parse_url(self, url, headers=None):
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        content = response.text
         self._retrieved_url = response.url
-        root = self._parse_string(content)
+        root = self._parse_string(response.content)
         root.make_links_absolute(self._retrieved_url)
         return root
 
