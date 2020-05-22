@@ -11,20 +11,12 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(CrawlerBase):
-    history_capable_date = "2005-05-30"
-    schedule = "Mo,Tu,We,Th,Fr"
+    history_capable_date = "2017-10-05"
     time_zone = "US/Eastern"
 
     def crawl(self, pub_date):
-        page_url = "http://evil-inc.com/%s/?post_type=comic" % (
-            pub_date.strftime("%Y/%m/%d")
-        )
-
-        page = self.parse_page(page_url)
-
-        url = page.src("img.attachment-large.wp-post-image")
-        if not url:
-            return
-        url = url.replace("?fit=1024%2C1024", "")
-        title = page.text(".post-title")
-        return CrawlerImage(url, title)
+        feed = self.parse_feed('https://evil-inc.com/feed/')
+        for entry in feed.for_date(pub_date):
+            url = entry.summary.src('img[src*="/wp-content/uploads/"]')
+            title = entry.title
+            return CrawlerImage(url, title)
