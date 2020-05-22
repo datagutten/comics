@@ -91,7 +91,6 @@ class LxmlParser(object):
         response.raise_for_status()
         content = response.text
         self._retrieved_url = response.url
-        content = content.replace(b'\x00', b'')
         root = self._parse_string(content)
         root.make_links_absolute(self._retrieved_url)
         return root
