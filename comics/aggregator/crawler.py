@@ -1,15 +1,11 @@
 import datetime
-import http.client
-import json
 import re
 import socket
 import time
-import urllib.error
-import urllib.parse
-import urllib.request
 import xml.sax._exceptions
 
 import pytz
+import requests
 from django.utils import timezone
 
 from comics.aggregator.exceptions import (
@@ -105,12 +101,8 @@ class CrawlerBase(object):
 
         try:
             results = self.crawl(pub_date)
-        except urllib.error.HTTPError as error:
-            raise CrawlerHTTPError(release.identifier, error.code)
-        except urllib.error.URLError as error:
-            raise CrawlerHTTPError(release.identifier, error.reason)
-        except http.client.BadStatusLine:
-            raise CrawlerHTTPError(release.identifier, "BadStatusLine")
+        except requests.RequestException as error:
+            raise CrawlerHTTPError(release.identifier, error.errno)
         except socket.error as error:
             raise CrawlerHTTPError(release.identifier, error)
         except xml.sax._exceptions.SAXException as error:
@@ -290,9 +282,9 @@ class CreatorsCrawlerBase(CrawlerBase):
             "feature_id=%s&year=%s"
         ) % (feature_id, pub_date.year)
 
-        req = urllib.request.Request(url, None, self.headers)
-        response = urllib.request.urlopen(req)
-        releases = json.load(response)
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        releases = response.json()
         for release in releases:
             if release["release"] == pub_date.strftime("%Y-%m-%d"):
                 page = self.parse_page(release["url"])
@@ -340,9 +332,9 @@ class StartsidenCrawlerBase(CrawlerBase):
 
         # req = urllib.request.Request(url, None, self.headers)
         # response = urllib.request.urlopen(req)
-        req = urllib.request.Request(url, None, self.headers)
-        response = urllib.request.urlopen(req)
-        releases = json.load(response)
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        releases = response.json()
 
         for article in releases["articles"]:
             matches = re.match(

@@ -1,9 +1,8 @@
-import contextlib
 import hashlib
-import http.client
 import socket
 import tempfile
-import urllib.request, urllib.error, urllib.parse
+
+import requests
 
 try:
     from PIL import Image as PILImage
@@ -88,18 +87,16 @@ class ImageDownloader(object):
 
     def _download_image(self, url, request_headers):
         try:
-            request = urllib.request.Request(url, None, request_headers)
-            with contextlib.closing(urllib.request.urlopen(request)) as http_file:
-                temp_file = tempfile.NamedTemporaryFile(suffix='comics')
-                temp_file.write(http_file.read())
-                temp_file.seek(0)
+            response = requests.get(url, headers=request_headers, stream=True)
+            response.raise_for_status()
+            temp_file = tempfile.NamedTemporaryFile(suffix="comics")
+            with open(temp_file, "wb") as fd:
+                for chunk in response.iter_content(chunk_size=128):
+                    fd.write(chunk)
                 return temp_file
-        except urllib.error.HTTPError as error:
-            raise DownloaderHTTPError(self.identifier, error.code)
-        except urllib.error.URLError as error:
-            raise DownloaderHTTPError(self.identifier, error.reason)
-        except http.client.BadStatusLine:
-            raise DownloaderHTTPError(self.identifier, 'BadStatusLine')
+
+        except requests.RequestException as error:
+            raise DownloaderHTTPError(self.identifier, error.errno)
         except socket.error as error:
             raise DownloaderHTTPError(self.identifier, error)
 
