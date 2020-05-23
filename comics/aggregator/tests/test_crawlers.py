@@ -1,7 +1,5 @@
 import os
-import sys
-from datetime import datetime
-from time import strptime
+from datetime import datetime, timedelta
 from urllib.error import HTTPError
 
 from ddt import ddt, idata
@@ -41,9 +39,17 @@ def get_history_capable_days():
     comics = []
     for slug in get_comics():
         module = get_comic_module(slug)
-        # crawler = module.Crawler(comic)
         if module.Crawler.history_capable_days is not None:
             comics.append(slug)
+    return comics
+
+
+def get_last_date(slug):
+    # TODO: Check schedule to get day
+    module = get_comic_module(slug)
+    schedule = module.Crawler.schedule
+    schedule = schedule.split(',')
+    return datetime.today().date()
 
 
 @ddt
@@ -93,9 +99,6 @@ class CrawlersTestCase(TestCase):
         crawler = module.Crawler(comic)"""
         crawler = get_crawler(slug)
 
-        if crawler.history_capable_date is None: # and crawler.history_capable_days is None:
-            return
-
         history_date = crawler.history_capable
         try:
             images = crawler.crawl(history_date)
@@ -109,3 +112,31 @@ class CrawlersTestCase(TestCase):
         for image in images:
             self.assertIsInstance(image, CrawlerImage)
             self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % history_date)
+
+    @idata(get_history_capable_days())
+    def test_history_capability_days(self, slug):
+        options = {'comic_slugs': [slug]}
+
+        data_loader = ComicDataLoader(options)
+        data_loader.start()
+
+        crawler = get_crawler(slug)
+
+        date_from = datetime.today() - timedelta(crawler.history_capable_days+10)
+        date_to = datetime.today() - timedelta(crawler.history_capable_days-10)
+        date = date_from
+        images = None
+
+        while date <= date_to:
+            date = date + timedelta(1)
+            images = crawler.crawl(date)
+            if images is not None:
+                break
+
+        self.assertIsNotNone(images, 'No images found between %s and %s' % (date_from, date_to))
+
+        if not hasattr(images, '__iter__'):
+            images = [images]
+        for image in images:
+            self.assertIsInstance(image, CrawlerImage)
+            self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % date)
