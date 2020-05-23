@@ -1,9 +1,9 @@
 import os
+import unittest
 from datetime import datetime, timedelta
 
 import requests
 from ddt import ddt, idata
-from django.test import TestCase
 
 from comics.aggregator.crawler import CrawlerImage, today
 from comics.comics import get_comic_module, get_comic_module_names
@@ -12,9 +12,8 @@ from comics.core.models import Comic
 
 
 def get_crawler(slug):
-    comic = Comic.objects.get(slug=slug)
     module = get_comic_module(slug)
-    return module.Crawler(comic)
+    return module.Crawler(None)
 
 
 def get_comics():
@@ -53,7 +52,7 @@ def get_last_date(slug):
 
 
 @ddt
-class CrawlersTestCase(TestCase):
+class CrawlersTestCase(unittest.TestCase):
     def crawl(self, crawler, pub_date, allow_404=False):
         try:
             return crawler.crawl(pub_date)
@@ -71,12 +70,7 @@ class CrawlersTestCase(TestCase):
         data_loader = ComicDataLoader(options)
         data_loader.start()
 
-        """aggregator = Aggregator(options=options)
-        aggregator.start()"""
-
-        comic = Comic.objects.get(slug=slug)
-        module = get_comic_module(slug)
-        crawler = module.Crawler(comic)
+        crawler = get_crawler(slug)
         pub_date = datetime.today().date()
 
         images = self.crawl(crawler, pub_date, True)
@@ -92,14 +86,6 @@ class CrawlersTestCase(TestCase):
 
     @idata(get_history_capable_date())
     def test_history_capable_date(self, slug):
-        options = {'comic_slugs': [slug]}
-
-        data_loader = ComicDataLoader(options)
-        data_loader.start()
-
-        """comic = Comic.objects.get(slug=slug)
-        module = get_comic_module(slug)
-        crawler = module.Crawler(comic)"""
         crawler = get_crawler(slug)
 
         history_date = crawler.history_capable
@@ -118,11 +104,6 @@ class CrawlersTestCase(TestCase):
 
     @idata(get_history_capable_days())
     def test_history_capability_days(self, slug):
-        options = {'comic_slugs': [slug]}
-
-        data_loader = ComicDataLoader(options)
-        data_loader.start()
-
         crawler = get_crawler(slug)
 
         date_from = today() - timedelta(crawler.history_capable_days+10)
@@ -149,3 +130,7 @@ class CrawlersTestCase(TestCase):
         for image in images:
             self.assertIsInstance(image, CrawlerImage)
             self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % date)
+
+
+if __name__ == "__main__":
+    unittest.main()
