@@ -5,7 +5,7 @@ import requests
 from ddt import ddt, idata
 from django.test import TestCase
 
-from comics.aggregator.crawler import CrawlerImage
+from comics.aggregator.crawler import CrawlerImage, today
 from comics.comics import get_comic_module, get_comic_module_names
 from comics.core.comic_data import ComicDataLoader
 from comics.core.models import Comic
@@ -125,16 +125,22 @@ class CrawlersTestCase(TestCase):
 
         crawler = get_crawler(slug)
 
-        date_from = datetime.today() - timedelta(crawler.history_capable_days+10)
-        date_to = datetime.today() - timedelta(crawler.history_capable_days-10)
+        date_from = today() - timedelta(crawler.history_capable_days+10)
+        date_to = today() - timedelta(crawler.history_capable_days-10)
+        if date_to>today():
+            date_to = today()
         date = date_from
         images = None
 
         while date <= date_to:
             date = date + timedelta(1)
-            images = self.crawl(crawler, date.date())
+            images = self.crawl(crawler, date)
             if images is not None:
-                break
+                if hasattr(images, '__iter__'):
+                    images = images[0]
+                    break
+                if isinstance(images, CrawlerImage) and images.url:
+                    break
 
         self.assertIsNotNone(images, 'No images found between %s and %s' % (date_from, date_to))
 
