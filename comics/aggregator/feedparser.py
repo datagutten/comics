@@ -11,6 +11,8 @@ from comics.aggregator.lxmlparser import LxmlParser
 
 class FeedParser(object):
     def __init__(self, url, headers=None):
+        if not headers:
+            headers = {'User-Agent': 'Mozilla 5.0'}
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         self.raw_feed = feedparser.parse(response.text.strip())

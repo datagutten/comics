@@ -87,6 +87,8 @@ class LxmlParser(object):
             return elements[0]
 
     def _parse_url(self, url, headers=None):
+        if not headers:
+            headers = {'User-Agent': 'Mozilla 5.0'}
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         self._retrieved_url = response.url
