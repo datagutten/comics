@@ -4,13 +4,20 @@ import datetime
 import warnings
 
 import feedparser
+import requests
 
 from comics.aggregator.lxmlparser import LxmlParser
 
 
 class FeedParser(object):
-    def __init__(self, url):
-        self.raw_feed = feedparser.parse(url)
+    def __init__(self, url, headers=None):
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        self.raw_feed = feedparser.parse(response.text.strip())
+        if 'bozo_exception' in self.raw_feed:
+            return
+        # TODO: Raise for bozo exception
+        # pprint(self.raw_feed)
         self.encoding = None
         if hasattr(self.raw_feed, 'encoding') and self.raw_feed.encoding:
             self.encoding = self.raw_feed.encoding

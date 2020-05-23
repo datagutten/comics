@@ -173,7 +173,7 @@ class CrawlerBase(object):
 
     def parse_feed(self, feed_url):
         if self.feed is None:
-            self.feed = FeedParser(feed_url)
+            self.feed = FeedParser(feed_url, headers=self.headers)
         return self.feed
 
     def parse_page(self, page_url):
