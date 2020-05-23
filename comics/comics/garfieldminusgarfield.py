@@ -1,4 +1,4 @@
-from comics.aggregator.crawler import CrawlerBase, CrawlerImage
+from comics.aggregator.tumblr import TumblrCrawlerBase
 from comics.core.comic_data import ComicDataBase
 
 
@@ -9,13 +9,10 @@ class ComicData(ComicDataBase):
     rights = "Travors"
 
 
-class Crawler(CrawlerBase):
-    history_capable_days = 30
+class Crawler(TumblrCrawlerBase):
+    history_capable_date = "2008-02-13"
     schedule = None
     time_zone = "Europe/London"
 
     def crawl(self, pub_date):
-        feed = self.parse_feed("http://garfieldminusgarfield.tumblr.com/rss")
-        for entry in feed.for_date(pub_date):
-            url = entry.summary.src("img")
-            return CrawlerImage(url)
+        return self.crawl_helper(pub_date, "garfieldminusgarfield")

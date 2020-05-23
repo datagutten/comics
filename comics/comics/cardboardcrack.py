@@ -1,4 +1,4 @@
-from comics.aggregator.crawler import CrawlerBase, CrawlerImage
+from comics.aggregator.tumblr import TumblrCrawlerBase
 from comics.core.comic_data import ComicDataBase
 
 
@@ -8,15 +8,13 @@ class ComicData(ComicDataBase):
     url = "http://cardboard-crack.com/"
     start_date = "2013-03-01"
     rights = "Magic Addict"
+    active = False
 
 
-class Crawler(CrawlerBase):
-    history_capable_days = 30
+class Crawler(TumblrCrawlerBase):
+    history_capable_date = "2013-03-25"
     schedule = "Mo,Tu,We,Th,Fr,Sa,Su"
     time_zone = "US/Pacific"
 
     def crawl(self, pub_date):
-        feed = self.parse_feed("http://cardboard-crack.com/rss")
-        for entry in feed.for_date(pub_date):
-            url = entry.summary.src('img[src$="500.gif"]')
-            return CrawlerImage(url)
+        return self.crawl_helper(pub_date, "cardboard-crack")
