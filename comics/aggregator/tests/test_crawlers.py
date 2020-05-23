@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
-from urllib.error import HTTPError
 
+import requests
 from ddt import ddt, idata
 from django.test import TestCase
 
@@ -54,6 +54,16 @@ def get_last_date(slug):
 
 @ddt
 class CrawlersTestCase(TestCase):
+    def crawl(self, crawler, pub_date):
+        try:
+            return crawler.crawl(pub_date)
+        except requests.exceptions.HTTPError as e:
+            if e.errno == 404:
+                self.skipTest(e)
+                return
+            else:
+                raise e
+
     @idata(get_comics())
     def test_crawl(self, slug):
         options = {'comic_slugs': [slug]}
@@ -69,14 +79,7 @@ class CrawlersTestCase(TestCase):
         crawler = module.Crawler(comic)
         pub_date = datetime.today().date()
 
-        try:
-            images = crawler.crawl(pub_date)
-        except HTTPError as e:
-            if e.code == 404:
-                self.skipTest(e.msg)
-                return
-            else:
-                raise e
+        images = self.crawl(crawler, pub_date)
 
         if images is None:
             self.skipTest('No release for %s %s' % (slug, pub_date))
@@ -102,8 +105,8 @@ class CrawlersTestCase(TestCase):
         history_date = crawler.history_capable
         try:
             images = crawler.crawl(history_date)
-        except HTTPError as e:
-            self.fail(e.msg)
+        except requests.exceptions.HTTPError as e:
+            self.fail(e)
 
         self.assertIsNotNone(images, 'No images found for date %s' % history_date)
 
@@ -129,7 +132,7 @@ class CrawlersTestCase(TestCase):
 
         while date <= date_to:
             date = date + timedelta(1)
-            images = crawler.crawl(date)
+            images = self.crawl(crawler, date.date())
             if images is not None:
                 break
 
