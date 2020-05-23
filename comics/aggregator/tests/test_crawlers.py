@@ -54,11 +54,11 @@ def get_last_date(slug):
 
 @ddt
 class CrawlersTestCase(TestCase):
-    def crawl(self, crawler, pub_date):
+    def crawl(self, crawler, pub_date, allow_404=False):
         try:
             return crawler.crawl(pub_date)
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
+            if e.response.status_code == 404 and allow_404:
                 self.skipTest(e)
                 return
             else:
@@ -79,7 +79,7 @@ class CrawlersTestCase(TestCase):
         crawler = module.Crawler(comic)
         pub_date = datetime.today().date()
 
-        images = self.crawl(crawler, pub_date)
+        images = self.crawl(crawler, pub_date, True)
 
         if images is None:
             self.skipTest('No release for %s %s' % (slug, pub_date))
