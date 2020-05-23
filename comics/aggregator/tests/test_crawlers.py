@@ -91,7 +91,7 @@ class CrawlersTestCase(TestCase):
                 self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % pub_date)
 
     @idata(get_history_capable_date())
-    def test_history_capability(self, slug):
+    def test_history_capable_date(self, slug):
         options = {'comic_slugs': [slug]}
 
         data_loader = ComicDataLoader(options)
