@@ -58,7 +58,7 @@ class CrawlersTestCase(TestCase):
         try:
             return crawler.crawl(pub_date)
         except requests.exceptions.HTTPError as e:
-            if e.errno == 404:
+            if e.response.status_code == 404:
                 self.skipTest(e)
                 return
             else:
