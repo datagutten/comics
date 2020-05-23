@@ -35,6 +35,7 @@ def get_history_capable_date():
 
 
 def get_history_capable_days():
+    return []
     comics = []
     for slug in get_comics():
         module = get_comic_module(slug)
