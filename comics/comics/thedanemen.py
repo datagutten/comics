@@ -8,6 +8,7 @@ class ComicData(ComicDataBase):
     url = "http://www.webtoons.com/en/comedy/the-danemen/list?title_no=395"
     start_date = "2015-03-02"
     rights = "David Danemen"
+    active = False
 
 
 class Crawler(CrawlerBase):
