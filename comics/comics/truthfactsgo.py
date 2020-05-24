@@ -7,7 +7,6 @@ class ComicData(ComicDataBase):
     language = "en"
     url = "http://www.gocomics.com/truth-facts"
     rights = "Wulff & Morgenthaler"
-    active = False
 
 
 class Crawler(GoComicsComCrawlerBase):
