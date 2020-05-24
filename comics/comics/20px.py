@@ -13,15 +13,16 @@ class ComicData(ComicDataBase):
 
 class Crawler(CrawlerBase):
     history_capable_days = 90
-    time_zone = 'US/Pacific'
+    time_zone = "US/Pacific"
 
     def crawl(self, pub_date):
-        feed = self.parse_feed('http://feeds.feedburner.com/20px')
+        feed = self.parse_feed("http://feeds.feedburner.com/20px")
         for entry in feed.for_date(pub_date):
-            if 'Comic' not in entry.tags:
+            if "Comic" not in entry.tags:
                 continue
             selector = (
-                'img[src*="/wp-content/uploads/"]:not(img[src$="_sq.jpg"])')
+                'img[src*="/wp-content/uploads/"]:not(img[src$="_sq.jpg"])'
+            )
             results = []
 
             for url in entry.content0.src(selector, allow_multiple=True):
@@ -30,5 +31,6 @@ class Crawler(CrawlerBase):
             if results:
                 results[0].title = entry.title
                 results[0].text = entry.content0.alt(
-                    selector, allow_multiple=True)[0]
+                    selector, allow_multiple=True
+                )[0]
                 return results

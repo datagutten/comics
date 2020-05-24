@@ -17,7 +17,7 @@ class Crawler(CrawlerBase):
     time_zone = "US/Eastern"
 
     def crawl(self, pub_date):
-        self.headers = {'User-Agent': 'Mozilla 5.0'}
+        self.headers = {"User-Agent": "Mozilla 5.0"}
         page_url = "http://www.gunshowcomic.com/d/%s.html" % (
             pub_date.strftime("%Y%m%d"),
         )

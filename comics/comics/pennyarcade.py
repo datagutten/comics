@@ -24,8 +24,8 @@ class Crawler(CrawlerBase):
         )
         page = self.parse_page(page_url)
         # The site gives a 404 page without a real 404 code
-        page_title = page.text('title')
-        if page_title == 'Penny Arcade - 404':
+        page_title = page.text("title")
+        if page_title == "Penny Arcade - 404":
             return
 
         title = page.alt("#comicFrame img")

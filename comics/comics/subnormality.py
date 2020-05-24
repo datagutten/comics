@@ -33,7 +33,9 @@ class Crawler(CrawlerBase):
                 )
             )
             result = [
-                CrawlerImage(el.attrib["src"], None, el.attrib.get("title", None))
+                CrawlerImage(
+                    el.attrib["src"], None, el.attrib.get("title", None)
+                )
                 for el in elements
             ]
             if result:
