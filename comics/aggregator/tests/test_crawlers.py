@@ -7,8 +7,6 @@ from ddt import ddt, idata
 
 from comics.aggregator.crawler import CrawlerImage, today
 from comics.comics import get_comic_module, get_comic_module_names
-from comics.core.comic_data import ComicDataLoader
-from comics.core.models import Comic
 
 
 def get_crawler(slug):
@@ -68,9 +66,6 @@ class CrawlersTestCase(unittest.TestCase):
     def test_crawl(self, slug):
         options = {'comic_slugs': [slug]}
         # print('Crawl %s' % slug)
-        data_loader = ComicDataLoader(options)
-        data_loader.start()
-
         crawler = get_crawler(slug)
         pub_date = datetime.today().date()
 
