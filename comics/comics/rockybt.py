@@ -1,4 +1,4 @@
-from comics.aggregator.crawler import CrawlerBase, CrawlerImage
+from comics.aggregator.crawler import CrawlerBase
 from comics.comics.rocky import ComicData as RockyData
 
 
