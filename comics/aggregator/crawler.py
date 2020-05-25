@@ -2,7 +2,7 @@ import datetime
 import re
 import socket
 import time
-import xml.sax._exceptions
+import xml
 
 import pytz
 import requests
@@ -105,7 +105,7 @@ class CrawlerBase(object):
             raise CrawlerHTTPError(release.identifier, error.errno)
         except socket.error as error:
             raise CrawlerHTTPError(release.identifier, error)
-        except xml.sax._exceptions.SAXException as error:
+        except xml.sax.SAXException as error:
             raise CrawlerHTTPError(release.identifier, str(error))
 
         if not results:
