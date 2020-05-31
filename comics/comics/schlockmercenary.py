@@ -21,6 +21,6 @@ class Crawler(CrawlerBase):
         )
         page = self.parse_page(page_url)
         result = []
-        for url in page.src("#comic img", allow_multiple=True):
+        for url in page.src("#strip-%s img" % pub_date.strftime('%Y-%m-%d'), allow_multiple=True):
             result.append(CrawlerImage(url))
         return result
