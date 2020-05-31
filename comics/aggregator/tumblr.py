@@ -1,9 +1,10 @@
+import json
 import re
 
 import requests
 
 from comics.aggregator.crawler import CrawlerBase, CrawlerImage
-from comics.aggregator.exceptions import CrawlerError, CrawlerHTTPError
+from comics.aggregator.exceptions import CrawlerError
 
 
 class TumblrCrawlerBase(CrawlerBase):
@@ -24,17 +25,17 @@ class TumblrCrawlerBase(CrawlerBase):
     def get_posts(self, page=1):
         if not self.api_token:
             self.get_api_token()
-        if page in self.posts:
-            return self.posts[page]
 
-        headers = {"authorization": "Bearer %s" % self.api_token}
+        self.headers["authorization"] = "Bearer %s" % self.api_token
         url = "https://api.tumblr.com/v2/blog/%s/posts/photo" % self.site
         if page > 1:
             url += "?offset=%d&page_number=%d" % ((page - 1) * 20, page)
-        response = requests.get(url, headers=headers)
-        if not response.status_code == 200:
-            raise CrawlerHTTPError(self.site, response.status_code)
-        posts = response.json()
+        page_obj = self.parse_page(url)
+        posts = json.loads(page_obj.root.text)
+
+        total_posts = posts["response"]["total_posts"]
+        if page > (total_posts/20)+1:
+            raise CrawlerError(self.site, 'Invalid page %d' % page)
 
         self.posts[page] = posts["response"]["posts"]  # Cache posts
         return posts["response"]["posts"]
