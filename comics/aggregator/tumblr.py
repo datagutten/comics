@@ -13,16 +13,13 @@ class TumblrCrawlerBase(CrawlerBase):
     headers = {'User-Agent': 'curl/7.64.0'}
 
     def get_api_token(self):
-        page = self.parse_page("https://%s.tumblr.com/archive/" % self.site)
-
-        token = page.root.xpath("//script[contains(.,'API_TOKEN')]")
-        if not token:
-            raise CrawlerError(self.site, "Unable to get API token")
-
-        matches = re.search(r'"API_TOKEN":"(.+?)"', token[0].text)
-        if not matches:
-            raise CrawlerError(self.site, "Unable to get API token")
-        self.api_token = matches.group(1)
+        try:
+            page = self.parse_page("https://%s.tumblr.com/archive/" % self.site)
+            token = page.root.xpath("//script[contains(.,'API_TOKEN')]")
+            matches = re.search(r'"API_TOKEN":"(.+?)"', token[0].text)
+            self.api_token = matches.group(1)
+        except Exception as e:
+            raise CrawlerError(self.site, "Unable to get API token: %s" % e)
 
     def get_posts(self, page=1):
         if not self.api_token:
