@@ -8,10 +8,11 @@ class ComicData(ComicDataBase):
     url = "http://chainsawsuit.com/"
     start_date = "2008-03-12"
     rights = "Kris Straub"
+    active = False
 
 
 class Crawler(CrawlerBase):
-    history_capable_days = 30
+    history_capable_date = '2018-01-16'
     schedule = "Mo,We,Fr"
     time_zone = "US/Pacific"
 
