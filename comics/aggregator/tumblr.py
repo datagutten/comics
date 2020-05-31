@@ -10,7 +10,6 @@ from comics.aggregator.exceptions import CrawlerError
 class TumblrCrawlerBase(CrawlerBase):
     site = None  # Tumblr blog identifier
     api_token = None  # Tumblr API key
-    posts = {}  # Post page cache
     headers = {'User-Agent': 'curl/7.64.0'}
 
     def get_api_token(self):
@@ -37,7 +36,6 @@ class TumblrCrawlerBase(CrawlerBase):
         if page > (total_posts/20)+1:
             raise CrawlerError(self.site, 'Invalid page %d' % page)
 
-        self.posts[page] = posts["response"]["posts"]  # Cache posts
         return posts["response"]["posts"]
 
     def crawl_posts(self, pub_date, page=1):
