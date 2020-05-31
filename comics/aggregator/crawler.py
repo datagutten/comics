@@ -199,6 +199,11 @@ class ComicsKingdomCrawlerBase(CrawlerBase):
         page_url = "https://www.comicskingdom.com/%s/%s" % (short_name, date)
         page = self.parse_page(page_url)
         url = page.src('img[src*="safr.kingfeatures.com"]')
+        page_title = page.text("title")
+        if page_title == "Comics Kingdom - About ":
+            return  # Requires premium
+        if page_title == "Comics Kingdom - WHOOPS! ":
+            return  # Error
         # King Features has weak https ciphers causing download to fail
         url = url.replace("https", "http")
         return CrawlerImage(url)
