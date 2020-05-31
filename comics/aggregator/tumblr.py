@@ -96,6 +96,8 @@ class TumblrCrawlerBase(CrawlerBase):
         if date and pub_date < date:  # If we are here, no post was found
             return self.crawl_posts(pub_date, page + 1)
 
-    def crawl_helper(self, pub_date, blog_identifier):
+    def crawl_helper(self, blog_identifier, pub_date):
+        if not blog_identifier:
+            raise ValueError('blog_identifier not set')
         self.site = blog_identifier
         return self.crawl_posts(pub_date)

@@ -17,4 +17,4 @@ class Crawler(TumblrCrawlerBase):
     time_zone = "US/Pacific"
 
     def crawl(self, pub_date):
-        return self.crawl_helper(pub_date, "cardboard-crack")
+        return self.crawl_helper("cardboard-crack", pub_date)
