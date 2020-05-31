@@ -29,12 +29,19 @@ class TumblrCrawlerBase(CrawlerBase):
         url = "https://api.tumblr.com/v2/blog/%s/posts/photo" % self.site
         if page > 1:
             url += "?offset=%d&page_number=%d" % ((page - 1) * 20, page)
-        page_obj = self.parse_page(url)
-        posts = json.loads(page_obj.root.text)
+        if url not in self.pages:
+            response = requests.get(url, headers=self.headers)
+            posts = response.json()
+            self.pages[url] = posts
+        else:
+            posts = self.pages[url]
 
         total_posts = posts["response"]["total_posts"]
         if page > (total_posts/20)+1:
             raise CrawlerError(self.site, 'Invalid page %d' % page)
+
+        if not posts:
+            raise CrawlerError(self.site, 'No posts found')
 
         return posts["response"]["posts"]
 
