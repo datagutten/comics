@@ -71,7 +71,7 @@ class CrawlersTestCase(unittest.TestCase):
 
         images = self.crawl(crawler, pub_date, True)
 
-        if images is None:
+        if images is None or images == []:
             self.skipTest('No release for %s %s' % (slug, pub_date))
         else:
             if not hasattr(images, '__iter__'):
