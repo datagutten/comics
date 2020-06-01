@@ -15,7 +15,7 @@ from comics.comics import get_comic_module, get_comic_module_names
 
 def get_crawler(slug):
     module = get_comic_module(slug)
-    return module.Crawler(None)
+    return module.Crawler(None), module.ComicData.active
 
 
 def get_comics():
@@ -75,7 +75,9 @@ class CrawlersTestCase(TestCase):
     @idata(get_comics())
     def test_crawl(self, slug):
         # print('Crawl %s' % slug)
-        crawler = get_crawler(slug)
+        crawler, active = get_crawler(slug)
+        if not active:
+            return
         pub_date = datetime.today().date()
 
         images = self.crawl(crawler, pub_date, True)
@@ -95,7 +97,7 @@ class CrawlersTestCase(TestCase):
 
     @idata(get_history_capable_date())
     def test_history_capable_date(self, slug):
-        crawler = get_crawler(slug)
+        crawler, active = get_crawler(slug)
 
         history_date = crawler.history_capable
         try:
@@ -119,7 +121,7 @@ class CrawlersTestCase(TestCase):
 
     @idata(get_history_capable_days())
     def test_history_capability_days(self, slug):
-        crawler = get_crawler(slug)
+        crawler, active = get_crawler(slug)
 
         date_from = today() - timedelta(crawler.history_capable_days + 10)
         date_to = today() - timedelta(crawler.history_capable_days - 10)
