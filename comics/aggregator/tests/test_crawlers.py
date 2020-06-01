@@ -1,9 +1,13 @@
 import os
 import unittest
 from datetime import datetime, timedelta
+from urllib.error import HTTPError
+
+from ddt import ddt, idata
+
+from django.test import TestCase
 
 import requests
-from ddt import ddt, idata
 
 from comics.aggregator.crawler import CrawlerImage, today
 from comics.comics import get_comic_module, get_comic_module_names
@@ -16,8 +20,8 @@ def get_crawler(slug):
 
 def get_comics():
     comics = get_comic_module_names()
-    if 'COMIC' in os.environ and os.environ['COMIC'] in comics:
-        return [os.environ['COMIC']]
+    if "COMIC" in os.environ and os.environ["COMIC"] in comics:
+        return [os.environ["COMIC"]]
     else:
         return comics
 
@@ -46,12 +50,12 @@ def get_last_date(slug):
     # TODO: Check schedule to get day
     module = get_comic_module(slug)
     schedule = module.Crawler.schedule
-    schedule = schedule.split(',')
+    schedule = schedule.split(",")
     return datetime.today().date()
 
 
 @ddt
-class CrawlersTestCase(unittest.TestCase):
+class CrawlersTestCase(TestCase):
     def crawl(self, crawler, pub_date, allow_404=False):
         try:
             return crawler.crawl(pub_date)
@@ -61,10 +65,15 @@ class CrawlersTestCase(unittest.TestCase):
                 return
             else:
                 raise e
+        except HTTPError as e:
+            if e.code == 404 and allow_404:
+                self.skipTest(e)
+                return
+            else:
+                raise e
 
     @idata(get_comics())
     def test_crawl(self, slug):
-        options = {'comic_slugs': [slug]}
         # print('Crawl %s' % slug)
         crawler = get_crawler(slug)
         pub_date = datetime.today().date()
@@ -72,13 +81,17 @@ class CrawlersTestCase(unittest.TestCase):
         images = self.crawl(crawler, pub_date, True)
 
         if images is None or images == []:
-            self.skipTest('No release for %s %s' % (slug, pub_date))
+            self.skipTest("No release for %s %s" % (slug, pub_date))
         else:
-            if not hasattr(images, '__iter__'):
+            if not hasattr(images, "__iter__"):
                 images = [images]
             for image in images:
                 self.assertIsInstance(image, CrawlerImage)
-                self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % pub_date)
+                self.assertIsNotNone(
+                    image.url,
+                    "Crawler returned image without URL for date %s"
+                    % pub_date,
+                )
 
     @idata(get_history_capable_date())
     def test_history_capable_date(self, slug):
@@ -90,21 +103,27 @@ class CrawlersTestCase(unittest.TestCase):
         except requests.exceptions.HTTPError as e:
             self.fail(e)
 
-        self.assertIsNotNone(images, 'No images found for date %s' % history_date)
+        self.assertIsNotNone(
+            images, "No images found for date %s" % history_date
+        )
 
-        if not hasattr(images, '__iter__'):
+        if not hasattr(images, "__iter__"):
             images = [images]
         for image in images:
             self.assertIsInstance(image, CrawlerImage)
-            self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % history_date)
+            self.assertIsNotNone(
+                image.url,
+                "Crawler returned image without URL for date %s"
+                % history_date,
+            )
 
     @idata(get_history_capable_days())
     def test_history_capability_days(self, slug):
         crawler = get_crawler(slug)
 
-        date_from = today() - timedelta(crawler.history_capable_days+10)
-        date_to = today() - timedelta(crawler.history_capable_days-10)
-        if date_to>today():
+        date_from = today() - timedelta(crawler.history_capable_days + 10)
+        date_to = today() - timedelta(crawler.history_capable_days - 10)
+        if date_to > today():
             date_to = today()
         date = date_from
         images = None
@@ -113,19 +132,24 @@ class CrawlersTestCase(unittest.TestCase):
             date = date + timedelta(1)
             images = self.crawl(crawler, date)
             if images is not None:
-                if hasattr(images, '__iter__'):
+                if hasattr(images, "__iter__"):
                     images = images[0]
                     break
                 if isinstance(images, CrawlerImage) and images.url:
                     break
 
-        self.assertIsNotNone(images, 'No images found between %s and %s' % (date_from, date_to))
+        self.assertIsNotNone(
+            images, "No images found between %s and %s" % (date_from, date_to)
+        )
 
-        if not hasattr(images, '__iter__'):
+        if not hasattr(images, "__iter__"):
             images = [images]
         for image in images:
             self.assertIsInstance(image, CrawlerImage)
-            self.assertIsNotNone(image.url, 'Crawler returned image without URL for date %s' % date)
+            self.assertIsNotNone(
+                image.url,
+                "Crawler returned image without URL for date %s" % date,
+            )
 
 
 if __name__ == "__main__":
