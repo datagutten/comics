@@ -402,7 +402,11 @@ class ComicControlCrawlerBase(CrawlerBase):
     def crawl_helper(self, site_url, pub_date):
         if site_url[-1] == "/":
             site_url = site_url[0:-1]
-        feed = self.parse_feed("%s/comic/rss" % site_url)
+        if site_url.find("pixietrixcomix.com") > -1:
+            feed = self.parse_feed("%s/rss" % site_url)
+        else:
+            feed = self.parse_feed("%s/comic/rss" % site_url)
+
         for entry in feed.for_date(pub_date):
             page = self.parse_page(entry.link)
             url = page.src("img#cc-comic")
