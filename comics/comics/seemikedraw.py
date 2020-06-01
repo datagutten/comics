@@ -13,7 +13,7 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(TumblrCrawlerBase):
-    history_capable_date = "2014-05-06"
+    history_capable_date = "2013-01-30"
     time_zone = "Australia/Sydney"
 
     def crawl(self, pub_date):
