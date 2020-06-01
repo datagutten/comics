@@ -11,7 +11,7 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(CrawlerBase):
-    history_capable_date = "2000-12-01"
+    history_capable_days = 30
     time_zone = "Europe/Stockholm"
 
     def crawl(self, pub_date):
