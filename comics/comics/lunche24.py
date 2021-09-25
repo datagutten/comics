@@ -13,12 +13,12 @@ class ComicData(ComicDataBase):
 
 
 class Crawler(CrawlerBase):
-    history_capable_date = "2012-11-02"
+    history_capable_date = "2021-07-01"
     schedule = "Mo,Tu,We,Th,Fr,Sa"
     time_zone = "Europe/Oslo"
 
     def crawl(self, pub_date):
-        url = "http://static.e24.no/images/comics/lunch_%s.gif" % (
-            pub_date.strftime("%Y%m%d")
+        url = "https://api.e24.no/content/v1/comics/%s" % (
+            pub_date.strftime("%Y-%m-%d")
         )
         return CrawlerImage(url)
