@@ -56,7 +56,7 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
     "sphinxcontrib-httpdomain>=1.8.1",
 ]
-lint = ["ruff>=0.15.16"]
+lint = ["ruff>=0.15.17"]
 tests = [
     "freezegun>=1.5.5",
     "pytest>=8.4.1",
